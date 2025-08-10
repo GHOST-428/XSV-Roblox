@@ -1,18 +1,18 @@
 # XSV Script
 
 ## Player
-### Movement - (Speed hack, Jump Boost)
-### Fly
-### NoClip
+### ⚪ Movement - (Speed hack, Jump Boost)
+### ⚪ Fly
+### ⚪ NoClip
 
 ## Visual
-### ESP - (Player)
+### ⚪ ESP - (Player)
 
 ## Visual
-### ESP - (Player)
+### ⚪ ESP - (Player)
 
 ## List
-### All Players (The player list)
+### ⚪ All Players (The player list)
 
 ## Troll
-### (404)
+### ⚪ (404)
