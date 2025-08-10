@@ -6,9 +6,13 @@ local UIS = game:GetService("UserInputService")
 
 -- Animate
 local humanoid = game.Players.LocalPlayer.Character.Humanoid
-local animation = Instance.new("Animation")
-animation.AnimationId = "rbxassetid://5918726674"
-local track = humanoid:LoadAnimation(animation)
+local track
+
+local function InitAnim(animID)
+    local animation = Instance.new("Animation")
+    animation.AnimationId = animID
+    track = humanoid:LoadAnimation(animation)
+end
 
 local Settings = {
     Esp = false,
@@ -94,7 +98,7 @@ Troll:NewToggle("404", "Enable/Disable TP", function(state)
     Settings.The404 = state
 
     if state then
-        track = humanoid:LoadAnimation(animation)
+        InitAnim("rbxassetid://5918726674")
         track.Priority = Enum.AnimationPriority.Action
         track:Play()
         track:AdjustSpeed(1.0)  -- Скорость воспроизведения
@@ -191,6 +195,6 @@ RunService.Heartbeat:Connect(function()
     end
 
     if Settings.The404 then
-        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
+        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 1)
     end
 end)
