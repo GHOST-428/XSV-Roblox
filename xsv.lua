@@ -19,7 +19,7 @@ local Settings = {
     Jump = 30,
     Players = {},
     CurrentPlayer,
-    Fuck = false
+    The404 = false
 }
 
 --- Player
@@ -32,7 +32,7 @@ local Noclip = TabPlayer:NewSection("NoClip")
 --- Visual
 local TabVisual = Window:NewTab("Visual")
 -- Section
-local Visual = TabVisual:NewSection("Visual")
+local Visual = TabVisual:NewSection("ESP")
 
 --- Players
 local TabPlayers = Window:NewTab("Players")
@@ -67,7 +67,7 @@ Noclip:NewToggle("Enable", "Enable/Disable Noclip", function(state)
 end)
 
 -- Visual
-Visual:NewToggle("Player ESP", "Show player ESP", function(state)
+Visual:NewToggle("Player", "Show player ESP", function(state)
     Settings.Esp = state
 end)
 
@@ -91,7 +91,7 @@ end)
 
 -- Troll
 Troll:NewToggle("404", "Enable/Disable TP", function(state)
-    Settings.Fuck = state
+    Settings.The404 = state
 
     if state then
         track = humanoid:LoadAnimation(animation)
@@ -190,7 +190,7 @@ RunService.Heartbeat:Connect(function()
         end
     end
 
-    if Settings.Fuck then
-        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 1.5)
+    if Settings.The404 then
+        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
     end
 end)
