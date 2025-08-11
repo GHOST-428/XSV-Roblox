@@ -1,17 +1,16 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robojini/Tuturial_UI_Library/main/UI_Template_1"))()
-local Window = Library.CreateLib("XSV", "RJTheme3")
+local Window = Library.CreateLib("XSV [1.2]", "RJTheme3")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 -- Animate
-local humanoid = game.Players.LocalPlayer.Character.Humanoid
 local track
 
 local function InitAnim(animID)
     local animation = Instance.new("Animation")
     animation.AnimationId = animID
-    track = humanoid:LoadAnimation(animation)
+    track = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(animation)
 end
 
 local Settings = {
@@ -23,7 +22,8 @@ local Settings = {
     Jump = 30,
     Players = {},
     CurrentPlayer,
-    The404 = false
+    Bang = false,
+    FaceSit = false
 }
 
 --- Player
@@ -85,7 +85,7 @@ Controll:NewButton("Refresh List", "Update Player List", function()
 
     -- Добавляем всех игроков
     for _, player in pairs(Players:GetPlayers()) do
-        local button = List:NewButton(player.Name, "The Player", function()
+        local button = List:NewButton(player.DisplayName, "The Player", function()
             Settings.CurrentPlayer = player
         end)
 
@@ -94,11 +94,15 @@ Controll:NewButton("Refresh List", "Update Player List", function()
 end)
 
 -- Troll
-Troll:NewToggle("404", "Enable/Disable TP", function(state)
-    Settings.The404 = state
+Troll:NewToggle("Bang", "Enable/Disable Bang", function(state)
+    Settings.Bang = state
 
     if state then
-        InitAnim("rbxassetid://5918726674")
+        if game.Players.LocalPlayer.Character.Humanoid.RigType == "R15" then
+            InitAnim("rbxassetid://5918726674")
+        else
+            InitAnim("rbxassetid://148840371")
+        end
         track.Priority = Enum.AnimationPriority.Action
         track:Play()
         track:AdjustSpeed(1.0)  -- Скорость воспроизведения
@@ -106,6 +110,16 @@ Troll:NewToggle("404", "Enable/Disable TP", function(state)
         if track then
             track:Stop()
         end
+    end
+end)
+
+Troll:NewToggle("FaceSit", "Enable/Disable Sit on Face", function(state)
+    Settings.FaceSit = state
+
+    if state then
+        game.Players.LocalPlayer.Character.Humanoid.Sit = true
+    else
+        game.Players.LocalPlayer.Character.Humanoid.Sit = false
     end
 end)
 
@@ -194,7 +208,11 @@ RunService.Heartbeat:Connect(function()
         end
     end
 
-    if Settings.The404 then
+    if Settings.Bang then
         Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 1)
+    end
+
+    if Settings.FaceSit then
+        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, -0.6) * CFrame.Angles(0, math.pi, 0)
     end
 end)
