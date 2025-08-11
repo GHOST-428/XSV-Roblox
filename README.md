@@ -1,5 +1,6 @@
 # Player
-### ⚪  Movement - (Speed hack, Jump Boost)
+### ⚪  Speed hack
+### ⚪  Jump Boost
 ### ⚪  Fly
 ### ⚪  NoClip
 
