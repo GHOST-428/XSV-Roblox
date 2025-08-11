@@ -10,4 +10,5 @@
 ### ⚪  All Players (The player list)
 
 # Troll
-### ⚪  (404)
+### ⚪  Bang
+### ⚪  Face Sit
