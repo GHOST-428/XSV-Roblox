@@ -13,3 +13,4 @@
 # Troll
 ### ⚪  Bang
 ### ⚪  Face Sit
+### ⚪  Fling
