@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robojini/Tuturial_UI_Library/main/UI_Template_1"))()
-local Window = Library.CreateLib("XSV [1.2]", "RJTheme3")
+local Window = Library.CreateLib("XSV [1.3]", "RJTheme3")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
@@ -23,7 +23,8 @@ local Settings = {
     Players = {},
     CurrentPlayer,
     Bang = false,
-    FaceSit = false
+    FaceSit = false,
+    Flinging = false
 }
 
 --- Player
@@ -47,7 +48,7 @@ local Controll = TabPlayers:NewSection("Controll")
 --- Fun
 local TabTroll = Window:NewTab("Troll")
 -- Section
-local Troll = TabTroll:NewSection("Current")
+local Current = TabTroll:NewSection("Current")
 
 -- Player
 Player:NewSlider("Speed", "Walk Speed", 300, 1, function(s)
@@ -77,24 +78,16 @@ end)
 
 -- List
 Controll:NewButton("Refresh List", "Update Player List", function()
-    -- Полностью очищаем секцию
-    for _, button in ipairs(Settings.Players) do
-        button.object:Destroy()
-    end
-    Settings.Players = {}
-
     -- Добавляем всех игроков
     for _, player in pairs(Players:GetPlayers()) do
-        local button = List:NewButton(player.DisplayName, "The Player", function()
+        button = List:NewButton(player.DisplayName, "The Player", function()
             Settings.CurrentPlayer = player
         end)
-
-        table.insert(Settings.Players, button)
     end
 end)
 
 -- Troll
-Troll:NewToggle("Bang", "Enable/Disable Bang", function(state)
+Current:NewToggle("Bang", "Enable/Disable Bang", function(state)
     Settings.Bang = state
 
     if state then
@@ -113,13 +106,32 @@ Troll:NewToggle("Bang", "Enable/Disable Bang", function(state)
     end
 end)
 
-Troll:NewToggle("FaceSit", "Enable/Disable Sit on Face", function(state)
+Current:NewToggle("FaceSit", "Enable/Disable Sit on Face", function(state)
     Settings.FaceSit = state
 
     if state then
         game.Players.LocalPlayer.Character.Humanoid.Sit = true
     else
         game.Players.LocalPlayer.Character.Humanoid.Sit = false
+    end
+end)
+
+Current:NewButton("Fling", "The Fling for Selected Player", function()
+    -- Players.LocalPlayer
+    -- Settings.CurrentPlayer
+
+    local Thrust = Instance.new('BodyThrust', Players.LocalPlayer.Character.HumanoidRootPart)
+    Thrust.Force = Vector3.new(9999,9999,9999)
+    Thrust.Name = "YeetForce"
+
+    repeat
+        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame
+        Thrust.Location = Settings.CurrentPlayer.Character.HumanoidRootPart.Position
+        RunService.Heartbeat:wait()
+    until not Settings.CurrentPlayer.Character:FindFirstChild("Head") or not Settings.CurrentPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+    if Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChild("YeetForce") then
+        Players.LocalPlayer.Character.HumanoidRootPart.YeetForce:Destroy()
     end
 end)
 
