@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robojini/Tuturial_UI_Library/main/UI_Template_1"))()
-local Window = Library.CreateLib("XSV [1.3]", "RJTheme3")
+local Window = Library.CreateLib("XSV [1.4]", "RJTheme3")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
@@ -49,6 +49,12 @@ local Controll = TabPlayers:NewSection("Controll")
 local TabTroll = Window:NewTab("Troll")
 -- Section
 local Current = TabTroll:NewSection("Current")
+
+--- Animations
+local TabAnimations = Window:NewTab("Animations")
+-- Section
+local R15 = TabAnimations:NewSection("R15")
+local Controll2 = TabAnimations:NewSection("Controll")
 
 -- Player
 Player:NewSlider("Speed", "Walk Speed", 300, 1, function(s)
@@ -133,6 +139,66 @@ Current:NewButton("Fling", "The Fling for Selected Player", function()
     if Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChild("YeetForce") then
         Players.LocalPlayer.Character.HumanoidRootPart.YeetForce:Destroy()
     end
+end)
+
+R15:NewButton("Godlike", "The Animation", function()
+    InitAnim("rbxassetid://10714347256")
+
+    track.Priority = Enum.AnimationPriority.Action
+    track:Play()
+    track:AdjustSpeed(1.0)  -- Скорость воспроизведения
+end)
+
+R15:NewButton("Float", "The Animation", function()
+    InitAnim("rbxassetid://123867580718466")
+
+    track.Priority = Enum.AnimationPriority.Action
+    track:Play()
+    track:AdjustSpeed(1.0)  -- Скорость воспроизведения
+end)
+
+R15:NewButton("Gojo Floating", "The Animation", function()
+    InitAnim("rbxassetid://73211757884080")
+
+    track.Priority = Enum.AnimationPriority.Action
+    track:Play()
+    track:AdjustSpeed(1.0)  -- Скорость воспроизведения
+end)
+
+R15:NewButton("Idle Floating", "The Animation", function()
+    InitAnim("rbxassetid://103578898641453")
+
+    track.Priority = Enum.AnimationPriority.Action
+    track:Play()
+    track:AdjustSpeed(1.0)  -- Скорость воспроизведения
+end)
+
+R15:NewButton("God Float", "The Animation", function()
+    InitAnim("rbxassetid://100681208320300")
+
+    track.Priority = Enum.AnimationPriority.Action
+    track:Play()
+    track:AdjustSpeed(1.0)  -- Скорость воспроизведения
+end)
+
+R15:NewButton("Build", "The Animation", function()
+    InitAnim("rbxassetid://113006894305390")
+
+    track.Priority = Enum.AnimationPriority.Action
+    track:Play()
+    track:AdjustSpeed(1.0)  -- Скорость воспроизведения
+end)
+
+R15:NewButton("Angel Fly", "The Animation", function()
+    InitAnim("rbxassetid://77529400769588")
+
+    track.Priority = Enum.AnimationPriority.Action
+    track:Play()
+    track:AdjustSpeed(1.0)  -- Скорость воспроизведения
+end)
+
+Controll2:NewButton("Stop", "Stop All Animations", function()
+    track:Stop()
 end)
 
 -- Loop
