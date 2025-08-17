@@ -1,11 +1,57 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robojini/Tuturial_UI_Library/main/UI_Template_1"))()
-local Window = Library.CreateLib("XSV [1.4]", "RJTheme3")
+-- Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
+-- Logo Gui
+local TweenService = game:GetService("TweenService")
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+-- Logo
+local image = Instance.new("ImageLabel")
+image.Parent = screenGui
+image.Size = UDim2.new(0, 200, 0, 200)
+image.AnchorPoint = Vector2.new(0.5, 0.5)
+image.Position = UDim2.new(0.5, 0, 0.5, 0)
+image.BackgroundTransparency = 1
+image.Image = "rbxassetid://91438373912852"
+--Logo Apply
+local function LogoShow()
+    -- Уменьшение
+    TweenService:Create(
+        image,
+        TweenInfo.new(3, Enum.EasingStyle.Quad),
+        {Size = UDim2.new(0, 200 * 0.6, 0, 200 * 0.6)}
+    ):Play()
+    task.wait(3)
 
--- Animate
+    -- Увеличение
+    TweenService:Create(
+        image,
+        TweenInfo.new(3, Enum.EasingStyle.Quad),
+        {Size = UDim2.new(0, 200 * 0.9, 0, 200 * 0.9)}
+    ):Play()
+    task.wait(3)
+
+    TweenService:Create(
+        image,
+        TweenInfo.new(1, Enum.EasingStyle.Quad),
+        {ImageTransparency = 1} -- полностью прозрачно
+    ):Play()
+
+    task.wait(2)
+
+    image:Destroy()
+end
+-- Show Logo
+LogoShow()
+-- Gui
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robojini/Tuturial_UI_Library/main/UI_Template_1"))()
+local Window = Library.CreateLib("XSV [1.6F]", "RJTheme3")
+
+-- Boxes
 local track
+local fling
 
 local function InitAnim(animID)
     local animation = Instance.new("Animation")
@@ -24,7 +70,8 @@ local Settings = {
     CurrentPlayer,
     Bang = false,
     FaceSit = false,
-    Flinging = false
+    Flinging = false,
+    TouchFlinging = false
 }
 
 --- Player
@@ -49,6 +96,7 @@ local Controll = TabPlayers:NewSection("Controll")
 local TabTroll = Window:NewTab("Troll")
 -- Section
 local Current = TabTroll:NewSection("Current")
+local All = TabTroll:NewSection("All")
 
 --- Animations
 local TabAnimations = Window:NewTab("Animations")
@@ -138,6 +186,48 @@ Current:NewButton("Fling", "The Fling for Selected Player", function()
 
     if Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChild("YeetForce") then
         Players.LocalPlayer.Character.HumanoidRootPart.YeetForce:Destroy()
+    end
+end)
+
+All:NewToggle("Fling", "Enable/Disable Fling on Touch", function(state)
+    local character = Players.LocalPlayer.Character
+    Settings.TouchFlinging = state
+
+    if state then
+        -- Включение флинга
+        fling = Instance.new("BodyAngularVelocity")
+        fling.Name = "1R_Module"
+        fling.Parent = character.HumanoidRootPart
+        fling.AngularVelocity = Vector3.new(0, 99999, 0)
+        fling.MaxTorque = Vector3.new(0, math.huge, 0)
+        fling.P = math.huge
+
+        for _, child in pairs(character:GetDescendants()) do
+            if child:IsA("BasePart") then
+                child.CanCollide = false
+                child.Massless = true
+                child.Velocity = Vector3.new(0, 0, 0)
+            end
+        end
+
+        repeat
+            fling.AngularVelocity = Vector3.new(0,99999,0)
+		    wait(.2)
+		    fling.AngularVelocity = Vector3.new(0,0,0)
+		    wait(.1)
+        until Settings.TouchFlinging == false
+    else
+        -- Выключение флинга
+        for i,v in pairs(character:GetChildren()) do
+            if v.ClassName == 'BodyAngularVelocity' then
+                v:Destroy()
+            end
+        end
+        for _, child in pairs(speakerChar:GetDescendants()) do
+            if child.ClassName == "Part" or child.ClassName == "MeshPart" then
+                child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
+            end
+        end
     end
 end)
 
