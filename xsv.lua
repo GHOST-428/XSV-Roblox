@@ -218,11 +218,7 @@ All:NewToggle("Fling", "Enable/Disable Fling on Touch", function(state)
         until Settings.TouchFlinging == false
     else
         -- Выключение флинга
-        for i,v in pairs(character:GetChildren()) do
-            if v.ClassName == 'BodyAngularVelocity' then
-                v:Destroy()
-            end
-        end
+        fling:Destroy()
         for _, child in pairs(speakerChar:GetDescendants()) do
             if child.ClassName == "Part" or child.ClassName == "MeshPart" then
                 child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
