@@ -13,13 +13,14 @@ function Kavo:DraggingEnabled(frame, parent)
     parent = parent or frame
     
     local dragging = false
-    local dragStart, startPos
-
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch then
+    local dragInput, mousePos, framePos
+	
+    local function handleInputBegan(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+           input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
-            dragStart = input.Position
-            startPos = parent.Position
+            mousePos = input.Position
+            framePos = parent.Position
             
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
@@ -27,16 +28,39 @@ function Kavo:DraggingEnabled(frame, parent)
                 end
             end)
         end
+    end
+
+    local function handleInputChanged(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or 
+           input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end
+
+    -- Подключаем обработчики для всех типов ввода
+    frame.InputBegan:Connect(handleInputBegan)
+    frame.InputChanged:Connect(handleInputChanged)
+
+    input.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - mousePos
+            parent.Position = UDim2.new(
+                framePos.X.Scale, 
+                framePos.X.Offset + delta.X,
+                framePos.Y.Scale, 
+                framePos.Y.Offset + delta.Y
+            )
+        end
     end)
 
     input.TouchMoved:Connect(function(input)
         if dragging and input then
-            local delta = input.Position - dragStart
+            local delta = input.Position - mousePos
             parent.Position = UDim2.new(
-                startPos.X.Scale, 
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale, 
-                startPos.Y.Offset + delta.Y
+                framePos.X.Scale, 
+                framePos.X.Offset + delta.X,
+                framePos.Y.Scale, 
+                framePos.Y.Offset + delta.Y
             )
         end
     end)
@@ -2686,4 +2710,5 @@ function Kavo.CreateLib(kavName, themeList)
     end  
     return Tabs
 end
+
 return Kavo
