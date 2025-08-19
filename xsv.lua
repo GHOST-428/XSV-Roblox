@@ -46,7 +46,7 @@ end
 -- Show Logo
 LogoShow()
 -- Gui
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robojini/Tuturial_UI_Library/main/UI_Template_1"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GHOST-428/XSV-Roblox/refs/heads/main/modded-gui.lua"))()
 local Window = Library.CreateLib("XSV [1.6F]", "RJTheme3")
 
 -- Boxes
@@ -66,7 +66,6 @@ local Settings = {
     NoClip = false,
     Speed = 19,
     Jump = 30,
-    Players = {},
     CurrentPlayer,
     Bang = false,
     FaceSit = false,
