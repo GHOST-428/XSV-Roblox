@@ -47,7 +47,7 @@ end
 LogoShow()
 -- Gui
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GHOST-428/XSV-Roblox/refs/heads/main/modded-gui.lua"))()
-local Window = Library.CreateLib("XSV [1.6F]", "RJTheme3")
+local Window = Library.CreateLib("XSV [1.7F]", "RJTheme3")
 
 -- Boxes
 local track
@@ -407,3 +407,4 @@ RunService.Heartbeat:Connect(function()
         Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, -0.6) * CFrame.Angles(0, math.pi, 0)
     end
 end)
+
