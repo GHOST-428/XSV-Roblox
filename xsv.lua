@@ -227,6 +227,10 @@ All:NewToggle("Fling", "Enable/Disable Fling on Touch", function(state)
 end)
 
 R15:NewButton("Godlike", "The Animation", function()
+    if track then
+        track:Stop()
+    end
+
     InitAnim("rbxassetid://10714347256")
 
     track.Priority = Enum.AnimationPriority.Action
@@ -235,6 +239,10 @@ R15:NewButton("Godlike", "The Animation", function()
 end)
 
 R15:NewButton("Float", "The Animation", function()
+    if track then
+        track:Stop()
+    end
+
     InitAnim("rbxassetid://123867580718466")
 
     track.Priority = Enum.AnimationPriority.Action
@@ -243,6 +251,10 @@ R15:NewButton("Float", "The Animation", function()
 end)
 
 R15:NewButton("Gojo Floating", "The Animation", function()
+    if track then
+        track:Stop()
+    end
+
     InitAnim("rbxassetid://73211757884080")
 
     track.Priority = Enum.AnimationPriority.Action
@@ -251,6 +263,10 @@ R15:NewButton("Gojo Floating", "The Animation", function()
 end)
 
 R15:NewButton("Idle Floating", "The Animation", function()
+    if track then
+        track:Stop()
+    end
+
     InitAnim("rbxassetid://103578898641453")
 
     track.Priority = Enum.AnimationPriority.Action
@@ -259,6 +275,10 @@ R15:NewButton("Idle Floating", "The Animation", function()
 end)
 
 R15:NewButton("God Float", "The Animation", function()
+
+    if track then
+        track:Stop()
+    end
     InitAnim("rbxassetid://100681208320300")
 
     track.Priority = Enum.AnimationPriority.Action
@@ -267,6 +287,10 @@ R15:NewButton("God Float", "The Animation", function()
 end)
 
 R15:NewButton("Build", "The Animation", function()
+    if track then
+        track:Stop()
+    end
+
     InitAnim("rbxassetid://113006894305390")
 
     track.Priority = Enum.AnimationPriority.Action
@@ -275,6 +299,10 @@ R15:NewButton("Build", "The Animation", function()
 end)
 
 R15:NewButton("Angel Fly", "The Animation", function()
+    if track then
+        track:Stop()
+    end
+
     InitAnim("rbxassetid://77529400769588")
 
     track.Priority = Enum.AnimationPriority.Action
