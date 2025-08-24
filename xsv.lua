@@ -5,6 +5,7 @@ local UIS = game:GetService("UserInputService")
 -- Logo Gui
 local TweenService = game:GetService("TweenService")
 local screenGui = Instance.new("ScreenGui")
+local StarterGui = game:GetService("StarterGui")
 screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
 -- Logo
@@ -43,6 +44,13 @@ local function LogoShow()
 
     image:Destroy()
 end
+-- Message
+StarterGui:SetCore("SendNotification", {
+    Title = "XSV 1.7F",
+    Text = "Welcome!",
+    Icon = image,
+    Duration = 5
+})
 -- Show Logo
 LogoShow()
 -- Gui
@@ -64,14 +72,53 @@ local Settings = {
     Fly = false,
     FlySpeed = 10,
     NoClip = false,
+    GodMode = false,
     Speed = 19,
     Jump = 30,
     CurrentPlayer,
     Bang = false,
     FaceSit = false,
     Flinging = false,
-    TouchFlinging = false
+    TouchFlinging = false,
+    RingParts = false,
+    RingRadius = 30,
+    RingPower = 5,
+    PartsForRing = {}
 }
+
+local function shouldAffectPart(part)
+    if not part or not part.Parent then return false end
+    if part:IsDescendantOf(Players.LocalPlayer.Character) then return false end
+    if part:IsA("Terrain") or part.Name == "Baseplate" or part.Name == "BasePlate" then return false end
+    if part.Anchored then return false end
+    if part.Name == "Handle" or part:FindFirstAncestorWhichIsA("Tool") then return false end
+    return true
+end
+
+local function addPart(part)
+    if part:IsA("BasePart") and shouldAffectPart(part) and not table.find(Settings.PartsForRing, part) then
+        part.CanCollide = false
+        table.insert(Settings.PartsForRing, part)
+    end
+end
+
+local function removePart(part)
+    local index = table.find(Settings.PartsForRing, part)
+    if index then table.remove(Settings.PartsForRing, index) end
+end
+
+-- Initialize parts
+for _, part in pairs(workspace:GetDescendants()) do 
+    addPart(part) 
+end
+
+workspace.DescendantAdded:Connect(function(descendant)
+    if descendant:IsA("BasePart") then addPart(descendant) end
+end)
+
+workspace.DescendantRemoving:Connect(function(descendant)
+    if descendant:IsA("BasePart") then removePart(descendant) end
+end)
 
 --- Player
 local TabPlayer = Window:NewTab("Player")
@@ -79,6 +126,7 @@ local TabPlayer = Window:NewTab("Player")
 local Player = TabPlayer:NewSection("Movement")
 local Fly = TabPlayer:NewSection("Fly")
 local Noclip = TabPlayer:NewSection("NoClip")
+local GodMode = TabPlayer:NewSection("GodMode")
 
 --- Visual
 local TabVisual = Window:NewTab("Visual")
@@ -103,6 +151,9 @@ local TabAnimations = Window:NewTab("Animations")
 local R15 = TabAnimations:NewSection("R15")
 local Controll2 = TabAnimations:NewSection("Controll")
 
+local TabRage = Window:NewTab("Rage")
+local Ring = TabRage:NewSection("Ring Parts")
+
 -- Player
 Player:NewSlider("Speed", "Walk Speed", 300, 1, function(s)
     Settings.Speed = s
@@ -122,6 +173,10 @@ end)
 
 Noclip:NewToggle("Enable", "Enable/Disable Noclip", function(state)
     Settings.NoClip = state
+end)
+
+GodMode:NewToggle("Enable", "Enable/Disable GodMode", function(state)
+    Settings.GodMode = state
 end)
 
 -- Visual
@@ -218,7 +273,7 @@ All:NewToggle("Fling", "Enable/Disable Fling on Touch", function(state)
     else
         -- Выключение флинга
         fling:Destroy()
-        for _, child in pairs(speakerChar:GetDescendants()) do
+        for _, child in pairs(Players.LocalPlayer.Character:GetDescendants()) do
             if child.ClassName == "Part" or child.ClassName == "MeshPart" then
                 child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
             end
@@ -226,6 +281,7 @@ All:NewToggle("Fling", "Enable/Disable Fling on Touch", function(state)
     end
 end)
 
+-- Animations
 R15:NewButton("Godlike", "The Animation", function()
     if track then
         track:Stop()
@@ -275,10 +331,10 @@ R15:NewButton("Idle Floating", "The Animation", function()
 end)
 
 R15:NewButton("God Float", "The Animation", function()
-
     if track then
         track:Stop()
     end
+
     InitAnim("rbxassetid://100681208320300")
 
     track.Priority = Enum.AnimationPriority.Action
@@ -291,7 +347,7 @@ R15:NewButton("Build", "The Animation", function()
         track:Stop()
     end
 
-    InitAnim("rbxassetid://113006894305390")
+    InitAnim("rbxassetid://109873544976020")
 
     track.Priority = Enum.AnimationPriority.Action
     track:Play()
@@ -312,6 +368,19 @@ end)
 
 Controll2:NewButton("Stop", "Stop All Animations", function()
     track:Stop()
+end)
+
+-- Rage
+Ring:NewToggle("Enable", "Enable/Disable Ring Parts", function(state)
+    Settings.RingParts = state
+end)
+
+Ring:NewSlider("Radius", "Radius for Parts", 3000, 5, function(s)
+    Settings.RingRadius = s
+end)
+
+Ring:NewSlider("Power", "Ring Rotation Speed", 5000, 5, function(s)
+    Settings.RingPower = s
 end)
 
 -- Loop
@@ -399,6 +468,16 @@ RunService.Heartbeat:Connect(function()
         end
     end
 
+    if Settings.GodMode then
+        Players.LocalPlayer.Character.Humanoid.MaxHealth = 300
+        Players.LocalPlayer.Character.Humanoid.Health = 300
+        for _, part in ipairs(Players.LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanTouch = false
+            end
+        end
+    end
+
     if Settings.Bang then
         Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 1)
     end
@@ -406,5 +485,34 @@ RunService.Heartbeat:Connect(function()
     if Settings.FaceSit then
         Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, -0.6) * CFrame.Angles(0, math.pi, 0)
     end
-end)
 
+    if Settings.RingParts then
+        local rootPart = Players.LocalPlayer.Character.HumanoidRootPart
+        local center = rootPart.Position
+
+        for _, part in pairs(Settings.PartsForRing) do
+            if part and part.Parent and not part.Anchored and shouldAffectPart(part) then
+                local pos = part.Position
+                local distance = (Vector3.new(pos.X, center.Y, pos.Z) - center).Magnitude
+                
+                -- Только если часть в радиусе влияния
+                if distance < 100 then
+                    local angle = math.atan2(pos.Z - center.Z, pos.X - center.X)
+                    local newAngle = angle + math.rad(50)
+                    
+                    local targetPos = Vector3.new(
+                        center.X + math.cos(newAngle) * math.min(Settings.RingPower, distance),
+                        center.Y + 6,
+                        center.Z + math.sin(newAngle) * math.min(Settings.RingPower, distance)
+                    )
+                    
+                    local direction = (targetPos - part.Position).unit
+                    part.Velocity = direction * Settings.RingRadius
+                else
+                    -- Если часть далеко, сбрасываем velocity
+                    part.Velocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end
+    end
+end)
