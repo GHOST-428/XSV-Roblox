@@ -552,7 +552,6 @@ RunService.Heartbeat:Connect(function()
     if Settings.LevitateParts then
         for _, part in pairs(workspace:GetDescendants()) do
             if part:IsA("BasePart") and not part.Anchored then
-                -- Игнорируем части персонажа и специальные объекты
                 if not part:IsDescendantOf(Players.LocalPlayer.Character) and
                 not part:IsA("Terrain") and
                 part.Name ~= "Baseplate" and
@@ -560,7 +559,6 @@ RunService.Heartbeat:Connect(function()
                 part.Name ~= "Handle" and
                 not part:FindFirstAncestorWhichIsA("Tool") then
                     
-                    -- Летят прямо вверх!
                     part.Velocity = Vector3.new(0, 12, 0)
                 end
             end
@@ -576,3 +574,4 @@ RunService.Heartbeat:Connect(function()
         end
     end
 end)
+
