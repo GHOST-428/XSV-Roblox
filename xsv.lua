@@ -55,7 +55,7 @@ StarterGui:SetCore("SendNotification", {
 LogoShow()
 -- Gui
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GHOST-428/XSV-Roblox/refs/heads/main/modded-gui.lua"))()
-local Window = Library.CreateLib("XSV [1.7F]", "RJTheme3")
+local Window = Library.CreateLib("XSV [1.7F][Nemor03]", "RJTheme3")
 
 -- Boxes
 local track
@@ -83,7 +83,9 @@ local Settings = {
     RingParts = false,
     RingRadius = 30,
     RingPower = 5,
-    PartsForRing = {}
+    LevitateParts = false,
+    PartsForControll = {},
+    BlackHoleParts = false
 }
 
 local function shouldAffectPart(part)
@@ -96,15 +98,16 @@ local function shouldAffectPart(part)
 end
 
 local function addPart(part)
-    if part:IsA("BasePart") and shouldAffectPart(part) and not table.find(Settings.PartsForRing, part) then
+    if part:IsA("BasePart") and shouldAffectPart(part) and not table.find(Settings.PartsForControll, part) then
         part.CanCollide = false
-        table.insert(Settings.PartsForRing, part)
+        table.insert(Settings.PartsForControll, part)
     end
 end
 
 local function removePart(part)
-    local index = table.find(Settings.PartsForRing, part)
-    if index then table.remove(Settings.PartsForRing, index) end
+    part.CanCollide = true
+    local index = table.find(Settings.PartsForControll, part)
+    if index then table.remove(Settings.PartsForControll, index) end
 end
 
 -- Initialize parts
@@ -151,8 +154,9 @@ local TabAnimations = Window:NewTab("Animations")
 local R15 = TabAnimations:NewSection("R15")
 local Controll2 = TabAnimations:NewSection("Controll")
 
-local TabRage = Window:NewTab("Rage")
-local Ring = TabRage:NewSection("Ring Parts")
+local TabGod = Window:NewTab("God's power")
+local Ring = TabGod:NewSection("Ring Parts")
+local Levitate = TabGod:NewSection("Levitate Parts")
 
 -- Player
 Player:NewSlider("Speed", "Walk Speed", 300, 1, function(s)
@@ -240,6 +244,18 @@ Current:NewButton("Fling", "The Fling for Selected Player", function()
 
     if Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChild("YeetForce") then
         Players.LocalPlayer.Character.HumanoidRootPart.YeetForce:Destroy()
+    end
+end)
+
+Current:NewToggle("BlackHole", "Enable/Disable BlackHole Parts", function(state)
+    Settings.BlackHoleParts = state
+
+    if not state then
+        for _, part in pairs(workspace:GetDescendants()) do
+            if part:IsA("BasePart") and not part.Anchored then
+                part.Velocity = Vector3.new(0, 0, 0)
+            end
+        end
     end
 end)
 
@@ -373,6 +389,14 @@ end)
 -- Rage
 Ring:NewToggle("Enable", "Enable/Disable Ring Parts", function(state)
     Settings.RingParts = state
+
+    if not state then
+        for _, part in pairs(Settings.PartsForControll) do
+            if part and part.Parent then
+                part.CanCollide = true
+            end
+        end
+    end
 end)
 
 Ring:NewSlider("Radius", "Radius for Parts", 3000, 5, function(s)
@@ -381,6 +405,25 @@ end)
 
 Ring:NewSlider("Power", "Ring Rotation Speed", 5000, 5, function(s)
     Settings.RingPower = s
+end)
+
+Levitate:NewToggle("Enable", "Enable/Disable Levitate Parts", function(state)
+    Settings.LevitateParts = state
+
+    if not state then
+        for _, part in pairs(Settings.PartsForControll) do
+            if part and part.Parent then
+                part.Velocity = Vector3.new(0, 0, 0)
+                part.CanCollide = true
+            end
+        end
+    end
+end)
+
+game.Players.LocalPlayer.Character.Humanoid.HealthChanged:Connect(function()
+    if Settings.GodMode then
+        game.Players.LocalPlayer.Character.Humanoid.Health = 100
+    end
 end)
 
 -- Loop
@@ -468,16 +511,6 @@ RunService.Heartbeat:Connect(function()
         end
     end
 
-    if Settings.GodMode then
-        Players.LocalPlayer.Character.Humanoid.MaxHealth = 300
-        Players.LocalPlayer.Character.Humanoid.Health = 300
-        for _, part in ipairs(Players.LocalPlayer.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanTouch = false
-            end
-        end
-    end
-
     if Settings.Bang then
         Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 1)
     end
@@ -490,7 +523,7 @@ RunService.Heartbeat:Connect(function()
         local rootPart = Players.LocalPlayer.Character.HumanoidRootPart
         local center = rootPart.Position
 
-        for _, part in pairs(Settings.PartsForRing) do
+        for _, part in pairs(Settings.PartsForControll) do
             if part and part.Parent and not part.Anchored and shouldAffectPart(part) then
                 local pos = part.Position
                 local distance = (Vector3.new(pos.X, center.Y, pos.Z) - center).Magnitude
@@ -512,6 +545,33 @@ RunService.Heartbeat:Connect(function()
                     -- Если часть далеко, сбрасываем velocity
                     part.Velocity = Vector3.new(0, 0, 0)
                 end
+            end
+        end
+    end
+
+    if Settings.LevitateParts then
+        for _, part in pairs(workspace:GetDescendants()) do
+            if part:IsA("BasePart") and not part.Anchored then
+                -- Игнорируем части персонажа и специальные объекты
+                if not part:IsDescendantOf(Players.LocalPlayer.Character) and
+                not part:IsA("Terrain") and
+                part.Name ~= "Baseplate" and
+                part.Name ~= "BasePlate" and
+                part.Name ~= "Handle" and
+                not part:FindFirstAncestorWhichIsA("Tool") then
+                    
+                    -- Летят прямо вверх!
+                    part.Velocity = Vector3.new(0, 12, 0)
+                end
+            end
+        end
+    end
+
+    if Settings.BlackHoleParts then
+        for _, part in pairs(workspace:GetDescendants()) do
+            if part:IsA("BasePart") and not part.Anchored then
+                local direction = (Settings.CurrentPlayer.Character.HumanoidRootPart.Position - part.Position).Unit
+                part.Velocity = direction * 100000000
             end
         end
     end
