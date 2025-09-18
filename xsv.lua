@@ -16,6 +16,17 @@ image.AnchorPoint = Vector2.new(0.5, 0.5)
 image.Position = UDim2.new(0.5, 0, 0.5, 0)
 image.BackgroundTransparency = 1
 image.Image = "rbxassetid://91438373912852"
+local logo = Instance.new("IconDecon")
+image.Parent = screenGui
+image.Image = "rbxassetid://91438373912852"
+-- Message
+StarterGui:SetCore("SendNotification", {
+    Title = "XSV 3.0X",
+    Text = "Welcome!",
+    Icon = logo,
+    Duration = 5
+})
+logo:Destroy()
 --Logo Apply
 local function LogoShow()
     -- Уменьшение
@@ -44,13 +55,6 @@ local function LogoShow()
 
     image:Destroy()
 end
--- Message
-StarterGui:SetCore("SendNotification", {
-    Title = "XSV 1.7F",
-    Text = "Welcome!",
-    Icon = image,
-    Duration = 5
-})
 -- Show Logo
 LogoShow()
 -- Gui
@@ -574,4 +578,3 @@ RunService.Heartbeat:Connect(function()
         end
     end
 end)
-
