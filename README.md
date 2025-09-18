@@ -14,8 +14,8 @@
 # Troll
 ### ⚪  Bang
 ### ⚪  Face Sit
-### ⚪  Fling
 ### ⚪  BlackHole Parts
+### ⚪  Fling
 
 
 # Animation Hub (R15)
