@@ -3,6 +3,7 @@
 ### ⚪  Jump Boost
 ### ⚪  Fly
 ### ⚪  NoClip
+### ⚪  GodMode (Beta)
 
 # Visual
 ### ⚪  ESP - (Player)
@@ -14,3 +15,17 @@
 ### ⚪  Bang
 ### ⚪  Face Sit
 ### ⚪  Fling
+### ⚪  BlackHole Parts
+
+
+# Animation Hub (R15)
+### ⚪  Godlike
+### ⚪  Float
+### ⚪  Idle Floating
+### ⚪  God Float
+### ⚪  Biblically Accurate
+### ⚪  Angel Fly
+
+# God's power
+### ⚪  Ring Parts
+### ⚪  Levitate Parts
