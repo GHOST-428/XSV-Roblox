@@ -158,7 +158,9 @@ local TabAnimations = Window:NewTab("Animations")
 local R15 = TabAnimations:NewSection("R15")
 local Controll2 = TabAnimations:NewSection("Controll")
 
+--- God's Power
 local TabGod = Window:NewTab("God's power")
+-- Section
 local Ring = TabGod:NewSection("Ring Parts")
 local Levitate = TabGod:NewSection("Levitate Parts")
 
@@ -320,18 +322,6 @@ R15:NewButton("Float", "The Animation", function()
     end
 
     InitAnim("rbxassetid://123867580718466")
-
-    track.Priority = Enum.AnimationPriority.Action
-    track:Play()
-    track:AdjustSpeed(1.0)  -- Скорость воспроизведения
-end)
-
-R15:NewButton("Gojo Floating", "The Animation", function()
-    if track then
-        track:Stop()
-    end
-
-    InitAnim("rbxassetid://73211757884080")
 
     track.Priority = Enum.AnimationPriority.Action
     track:Play()
