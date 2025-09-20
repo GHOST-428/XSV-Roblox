@@ -1287,6 +1287,215 @@ function Kavo.CreateLib(kavName, themeList)
                     return TogFunction
             end
 
+            function Elements:NewPlayerList()
+                local playerListFunctions = {}
+                local playerListFrame = Instance.new("Frame")
+                local playerListLayout = Instance.new("UIListLayout")
+                local searchBox = Instance.new("TextBox")
+                local searchBoxCorner = Instance.new("UICorner")
+                local refreshButton = Instance.new("TextButton")
+                local refreshButtonCorner = Instance.new("UICorner")
+                
+                playerListFrame.Name = "playerListFrame"
+                playerListFrame.Parent = sectionInners
+                playerListFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                playerListFrame.BackgroundTransparency = 1.000
+                playerListFrame.Size = UDim2.new(0, 352, 0, 200)
+                
+                playerListLayout.Name = "playerListLayout"
+                playerListLayout.Parent = playerListFrame
+                playerListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                playerListLayout.Padding = UDim.new(0, 5)
+                
+                -- Search box
+                searchBox.Name = "searchBox"
+                searchBox.Parent = playerListFrame
+                searchBox.BackgroundColor3 = themeList.ElementColor
+                searchBox.PlaceholderColor3 = Color3.fromRGB(200, 200, 200)
+                searchBox.PlaceholderText = "Search players..."
+                searchBox.Text = ""
+                searchBox.TextColor3 = themeList.TextColor
+                searchBox.TextSize = 14
+                searchBox.Size = UDim2.new(0, 352, 0, 30)
+                searchBox.Font = Enum.Font.Gotham
+                
+                searchBoxCorner.CornerRadius = UDim.new(0, 4)
+                searchBoxCorner.Parent = searchBox
+                
+                -- Refresh button
+                refreshButton.Name = "refreshButton"
+                refreshButton.Parent = playerListFrame
+                refreshButton.BackgroundColor3 = themeList.SchemeColor
+                refreshButton.Text = "Refresh"
+                refreshButton.TextColor3 = themeList.TextColor
+                refreshButton.TextSize = 14
+                refreshButton.Size = UDim2.new(0, 352, 0, 30)
+                refreshButton.Font = Enum.Font.Gotham
+                refreshButton.AutoButtonColor = false
+                
+                refreshButtonCorner.CornerRadius = UDim.new(0, 4)
+                refreshButtonCorner.Parent = refreshButton
+                
+                local playerEntries = {}
+                local currentPlayers = {}
+                
+                -- Function to create player entry
+                local function createPlayerEntry(player)
+                    local playerEntry = Instance.new("Frame")
+                    local playerName = Instance.new("TextLabel")
+                    local playerId = Instance.new("TextLabel")
+                    local playerCorner = Instance.new("UICorner")
+                    local playerLayout = Instance.new("UIListLayout")
+                    
+                    playerEntry.Name = player.Name
+                    playerEntry.Parent = playerListFrame
+                    playerEntry.BackgroundColor3 = themeList.ElementColor
+                    playerEntry.Size = UDim2.new(0, 352, 0, 40)
+                    playerEntry.ClipsDescendants = true
+                    
+                    playerCorner.CornerRadius = UDim.new(0, 4)
+                    playerCorner.Parent = playerEntry
+                    
+                    playerLayout.Name = "playerLayout"
+                    playerLayout.Parent = playerEntry
+                    playerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                    playerLayout.Padding = UDim.new(0, 5)
+                    playerLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+                    playerLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+                    
+                    playerName.Name = "playerName"
+                    playerName.Parent = playerEntry
+                    playerName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    playerName.BackgroundTransparency = 1.000
+                    playerName.Size = UDim2.new(0, 330, 0, 20)
+                    playerName.Font = Enum.Font.GothamSemibold
+                    playerName.Text = player.Name
+                    playerName.TextColor3 = themeList.TextColor
+                    playerName.TextSize = 14
+                    playerName.TextXAlignment = Enum.TextXAlignment.Left
+                    
+                    playerId.Name = "playerId"
+                    playerId.Parent = playerEntry
+                    playerId.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    playerId.BackgroundTransparency = 1.000
+                    playerId.Size = UDim2.new(0, 330, 0, 15)
+                    playerId.Font = Enum.Font.Gotham
+                    playerId.Text = "User ID: " .. player.UserId
+                    playerId.TextColor3 = Color3.fromRGB(200, 200, 200)
+                    playerId.TextSize = 12
+                    playerId.TextXAlignment = Enum.TextXAlignment.Left
+                    
+                    playerEntries[player] = playerEntry
+                    currentPlayers[player.Name:lower()] = player
+                    
+                    return playerEntry
+                end
+                
+                -- Function to update player list
+                local function updatePlayerList(filter)
+                    filter = filter and filter:lower() or ""
+                    
+                    -- Clear existing entries
+                    for _, entry in pairs(playerListFrame:GetChildren()) do
+                        if entry:IsA("Frame") and entry.Name ~= "searchBox" and entry.Name ~= "refreshButton" then
+                            entry:Destroy()
+                        end
+                    end
+                    
+                    playerEntries = {}
+                    currentPlayers = {}
+                    
+                    -- Add current players
+                    for _, player in pairs(players:GetPlayers()) do
+                        if filter == "" or player.Name:lower():find(filter) then
+                            createPlayerEntry(player)
+                        end
+                    end
+                    
+                    updateSectionFrame()
+                    UpdateSize()
+                end
+                
+                -- Initial player list
+                updatePlayerList()
+                
+                -- Player added event
+                players.PlayerAdded:Connect(function(player)
+                    if searchBox.Text == "" or player.Name:lower():find(searchBox.Text:lower()) then
+                        createPlayerEntry(player)
+                        updateSectionFrame()
+                        UpdateSize()
+                    end
+                end)
+                
+                -- Player removed event
+                players.PlayerRemoving:Connect(function(player)
+                    if playerEntries[player] then
+                        playerEntries[player]:Destroy()
+                        playerEntries[player] = nil
+                        currentPlayers[player.Name:lower()] = nil
+                        updateSectionFrame()
+                        UpdateSize()
+                    end
+                end)
+                
+                -- Search functionality
+                searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+                    updatePlayerList(searchBox.Text)
+                end)
+                
+                -- Refresh button functionality
+                refreshButton.MouseButton1Click:Connect(function()
+                    updatePlayerList(searchBox.Text)
+                end)
+                
+                -- Hover effects for refresh button
+                refreshButton.MouseEnter:Connect(function()
+                    game.TweenService:Create(refreshButton, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
+                        BackgroundColor3 = Color3.fromRGB(themeList.SchemeColor.r * 255 + 8, themeList.SchemeColor.g * 255 + 9, themeList.SchemeColor.b * 255 + 10)
+                    }):Play()
+                end)
+                
+                refreshButton.MouseLeave:Connect(function()
+                    game.TweenService:Create(refreshButton, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
+                        BackgroundColor3 = themeList.SchemeColor
+                    }):Play()
+                end)
+                
+                -- Theme updates
+                coroutine.wrap(function()
+                    while wait() do
+                        searchBox.BackgroundColor3 = themeList.ElementColor
+                        searchBox.TextColor3 = themeList.TextColor
+                        refreshButton.BackgroundColor3 = themeList.SchemeColor
+                        refreshButton.TextColor3 = themeList.TextColor
+                        
+                        for _, entry in pairs(playerEntries) do
+                            entry.BackgroundColor3 = themeList.ElementColor
+                            for _, child in pairs(entry:GetChildren()) do
+                                if child:IsA("TextLabel") then
+                                    if child.Name == "playerName" then
+                                        child.TextColor3 = themeList.TextColor
+                                    elseif child.Name == "playerId" then
+                                        child.TextColor3 = Color3.fromRGB(200, 200, 200)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)()
+                
+                function playerListFunctions:Refresh()
+                    updatePlayerList(searchBox.Text)
+                end
+                
+                function playerListFunctions:GetPlayerEntries()
+                    return playerEntries
+                end
+                
+                return playerListFunctions
+            end
+
             function Elements:NewSlider(slidInf, slidTip, maxvalue, minvalue, callback)
                 slidInf = slidInf or "Slider"
                 slidTip = slidTip or "Slider tip here"
