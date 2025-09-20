@@ -1288,9 +1288,10 @@ function Kavo.CreateLib(kavName, themeList)
                     return TogFunction
             end
 
-            function Elements:NewPlayerList()
+            function Elements:NewPlayerList(callback)
+                callback = callback or function() end
                 local playerListFunctions = {}
-                local playerListFrame = Instance.new("Frame")
+                local playerListFrame = Instance.new("ScrollingFrame")
                 local playerListLayout = Instance.new("UIListLayout")
                 local searchBox = Instance.new("TextBox")
                 local searchBoxCorner = Instance.new("UICorner")
@@ -1302,6 +1303,10 @@ function Kavo.CreateLib(kavName, themeList)
                 playerListFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 playerListFrame.BackgroundTransparency = 1.000
                 playerListFrame.Size = UDim2.new(0, 352, 0, 200)
+                playerListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+                playerListFrame.ScrollBarThickness = 5
+                playerListFrame.ScrollBarImageColor3 = themeList.SchemeColor
+                playerListFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
                 
                 playerListLayout.Name = "playerListLayout"
                 playerListLayout.Parent = playerListFrame
@@ -1310,7 +1315,7 @@ function Kavo.CreateLib(kavName, themeList)
                 
                 -- Search box
                 searchBox.Name = "searchBox"
-                searchBox.Parent = playerListFrame
+                searchBox.Parent = sectionInners
                 searchBox.BackgroundColor3 = themeList.ElementColor
                 searchBox.PlaceholderColor3 = Color3.fromRGB(200, 200, 200)
                 searchBox.PlaceholderText = "Search players..."
@@ -1325,7 +1330,7 @@ function Kavo.CreateLib(kavName, themeList)
                 
                 -- Refresh button
                 refreshButton.Name = "refreshButton"
-                refreshButton.Parent = playerListFrame
+                refreshButton.Parent = sectionInners
                 refreshButton.BackgroundColor3 = themeList.SchemeColor
                 refreshButton.Text = "Refresh"
                 refreshButton.TextColor3 = themeList.TextColor
@@ -1339,10 +1344,11 @@ function Kavo.CreateLib(kavName, themeList)
                 
                 local playerEntries = {}
                 local currentPlayers = {}
+                local selectedPlayer = nil
                 
                 -- Function to create player entry
                 local function createPlayerEntry(player)
-                    local playerEntry = Instance.new("Frame")
+                    local playerEntry = Instance.new("TextButton")
                     local playerName = Instance.new("TextLabel")
                     local playerId = Instance.new("TextLabel")
                     local playerCorner = Instance.new("UICorner")
@@ -1353,6 +1359,8 @@ function Kavo.CreateLib(kavName, themeList)
                     playerEntry.BackgroundColor3 = themeList.ElementColor
                     playerEntry.Size = UDim2.new(0, 352, 0, 40)
                     playerEntry.ClipsDescendants = true
+                    playerEntry.AutoButtonColor = false
+                    playerEntry.Text = ""
                     
                     playerCorner.CornerRadius = UDim.new(0, 4)
                     playerCorner.Parent = playerEntry
@@ -1386,6 +1394,47 @@ function Kavo.CreateLib(kavName, themeList)
                     playerId.TextSize = 12
                     playerId.TextXAlignment = Enum.TextXAlignment.Left
                     
+                    -- Click event for player selection
+                    playerEntry.MouseButton1Click:Connect(function()
+                        -- Deselect previous selection
+                        if selectedPlayer then
+                            if playerEntries[selectedPlayer] then
+                                playerEntries[selectedPlayer].BackgroundColor3 = themeList.ElementColor
+                            end
+                        end
+                        
+                        -- Select new player
+                        selectedPlayer = player
+                        playerEntry.BackgroundColor3 = Color3.fromRGB(
+                            themeList.ElementColor.r * 255 + 20,
+                            themeList.ElementColor.g * 255 + 20,
+                            themeList.ElementColor.b * 255 + 20
+                        )
+                        
+                        callback(player)
+                    end)
+                    
+                    -- Hover effects
+                    playerEntry.MouseEnter:Connect(function()
+                        if selectedPlayer ~= player then
+                            game.TweenService:Create(playerEntry, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
+                                BackgroundColor3 = Color3.fromRGB(
+                                    themeList.ElementColor.r * 255 + 10,
+                                    themeList.ElementColor.g * 255 + 10,
+                                    themeList.ElementColor.b * 255 + 10
+                                )
+                            }):Play()
+                        end
+                    end)
+                    
+                    playerEntry.MouseLeave:Connect(function()
+                        if selectedPlayer ~= player then
+                            game.TweenService:Create(playerEntry, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
+                                BackgroundColor3 = themeList.ElementColor
+                            }):Play()
+                        end
+                    end)
+                    
                     playerEntries[player] = playerEntry
                     currentPlayers[player.Name:lower()] = player
                     
@@ -1398,19 +1447,28 @@ function Kavo.CreateLib(kavName, themeList)
                     
                     -- Clear existing entries
                     for _, entry in pairs(playerListFrame:GetChildren()) do
-                        if entry:IsA("Frame") and entry.Name ~= "searchBox" and entry.Name ~= "refreshButton" then
+                        if entry:IsA("TextButton") then
                             entry:Destroy()
                         end
                     end
                     
                     playerEntries = {}
                     currentPlayers = {}
+                    selectedPlayer = nil
                     
-                    -- Add current players
-                    for _, player in pairs(players:GetPlayers()) do
-                        if filter == "" or player.Name:lower():find(filter) then
-                            createPlayerEntry(player)
+                    -- Add current players with error handling
+                    local success, result = pcall(function()
+                        return players:GetPlayers()
+                    end)
+                    
+                    if success then
+                        for _, player in pairs(result) do
+                            if filter == "" or player.Name:lower():find(filter) then
+                                createPlayerEntry(player)
+                            end
                         end
+                    else
+                        warn("Error getting players: " .. tostring(result))
                     end
                     
                     updateSectionFrame()
@@ -1435,6 +1493,11 @@ function Kavo.CreateLib(kavName, themeList)
                         playerEntries[player]:Destroy()
                         playerEntries[player] = nil
                         currentPlayers[player.Name:lower()] = nil
+                        
+                        if selectedPlayer == player then
+                            selectedPlayer = nil
+                        end
+                        
                         updateSectionFrame()
                         UpdateSize()
                     end
@@ -1470,9 +1533,19 @@ function Kavo.CreateLib(kavName, themeList)
                         searchBox.TextColor3 = themeList.TextColor
                         refreshButton.BackgroundColor3 = themeList.SchemeColor
                         refreshButton.TextColor3 = themeList.TextColor
+                        playerListFrame.ScrollBarImageColor3 = themeList.SchemeColor
                         
-                        for _, entry in pairs(playerEntries) do
-                            entry.BackgroundColor3 = themeList.ElementColor
+                        for player, entry in pairs(playerEntries) do
+                            if selectedPlayer == player then
+                                entry.BackgroundColor3 = Color3.fromRGB(
+                                    themeList.ElementColor.r * 255 + 20,
+                                    themeList.ElementColor.g * 255 + 20,
+                                    themeList.ElementColor.b * 255 + 20
+                                )
+                            else
+                                entry.BackgroundColor3 = themeList.ElementColor
+                            end
+                            
                             for _, child in pairs(entry:GetChildren()) do
                                 if child:IsA("TextLabel") then
                                     if child.Name == "playerName" then
@@ -1490,8 +1563,19 @@ function Kavo.CreateLib(kavName, themeList)
                     updatePlayerList(searchBox.Text)
                 end
                 
+                function playerListFunctions:GetSelectedPlayer()
+                    return selectedPlayer
+                end
+                
                 function playerListFunctions:GetPlayerEntries()
                     return playerEntries
+                end
+                
+                function playerListFunctions:ClearSelection()
+                    if selectedPlayer and playerEntries[selectedPlayer] then
+                        playerEntries[selectedPlayer].BackgroundColor3 = themeList.ElementColor
+                    end
+                    selectedPlayer = nil
                 end
                 
                 return playerListFunctions
