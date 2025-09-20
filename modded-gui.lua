@@ -1357,7 +1357,7 @@ function Kavo.CreateLib(kavName, themeList)
                     local playerCorner = Instance.new("UICorner")
                     local playerLayout = Instance.new("UIListLayout")
                     
-                    playerEntry.Name = player.Name
+                    playerEntry.Name = player.DisplayName
                     playerEntry.Parent = playerListFrame
                     playerEntry.BackgroundColor3 = themeList.ElementColor
                     playerEntry.Size = UDim2.new(0, 352, 0, 50)
