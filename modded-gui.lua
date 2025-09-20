@@ -1349,6 +1349,9 @@ function Kavo.CreateLib(kavName, themeList)
                 -- Function to create player entry
                 local function createPlayerEntry(player)
                     local playerEntry = Instance.new("TextButton")
+                    local playerContainer = Instance.new("Frame")
+                    local playerAvatar = Instance.new("ImageLabel")
+                    local playerInfo = Instance.new("Frame")
                     local playerName = Instance.new("TextLabel")
                     local playerId = Instance.new("TextLabel")
                     local playerCorner = Instance.new("UICorner")
@@ -1357,7 +1360,7 @@ function Kavo.CreateLib(kavName, themeList)
                     playerEntry.Name = player.Name
                     playerEntry.Parent = playerListFrame
                     playerEntry.BackgroundColor3 = themeList.ElementColor
-                    playerEntry.Size = UDim2.new(0, 352, 0, 40)
+                    playerEntry.Size = UDim2.new(0, 352, 0, 50)
                     playerEntry.ClipsDescendants = true
                     playerEntry.AutoButtonColor = false
                     playerEntry.Text = ""
@@ -1365,34 +1368,73 @@ function Kavo.CreateLib(kavName, themeList)
                     playerCorner.CornerRadius = UDim.new(0, 4)
                     playerCorner.Parent = playerEntry
                     
-                    playerLayout.Name = "playerLayout"
-                    playerLayout.Parent = playerEntry
-                    playerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-                    playerLayout.Padding = UDim.new(0, 5)
-                    playerLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-                    playerLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+                    playerContainer.Name = "playerContainer"
+                    playerContainer.Parent = playerEntry
+                    playerContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    playerContainer.BackgroundTransparency = 1.000
+                    playerContainer.Size = UDim2.new(1, 0, 1, 0)
+                    
+                    playerAvatar.Name = "playerAvatar"
+                    playerAvatar.Parent = playerContainer
+                    playerAvatar.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+                    playerAvatar.BorderSizePixel = 0
+                    playerAvatar.Position = UDim2.new(0, 5, 0.5, -20)
+                    playerAvatar.Size = UDim2.new(0, 40, 0, 40)
+                    playerAvatar.Image = "rbxassetid://0" -- Placeholder
+                    
+                    local avatarCorner = Instance.new("UICorner")
+                    avatarCorner.CornerRadius = UDim.new(0, 20)
+                    avatarCorner.Parent = playerAvatar
+                    
+                    playerInfo.Name = "playerInfo"
+                    playerInfo.Parent = playerContainer
+                    playerInfo.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    playerInfo.BackgroundTransparency = 1.000
+                    playerInfo.Position = UDim2.new(0, 55, 0, 0)
+                    playerInfo.Size = UDim2.new(1, -55, 1, 0)
                     
                     playerName.Name = "playerName"
-                    playerName.Parent = playerEntry
+                    playerName.Parent = playerInfo
                     playerName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                     playerName.BackgroundTransparency = 1.000
-                    playerName.Size = UDim2.new(0, 330, 0, 20)
+                    playerName.Position = UDim2.new(0, 0, 0, 5)
+                    playerName.Size = UDim2.new(1, 0, 0, 20)
                     playerName.Font = Enum.Font.GothamSemibold
                     playerName.Text = player.Name
                     playerName.TextColor3 = themeList.TextColor
                     playerName.TextSize = 14
                     playerName.TextXAlignment = Enum.TextXAlignment.Left
+                    playerName.TextTruncate = Enum.TextTruncate.AtEnd
                     
                     playerId.Name = "playerId"
-                    playerId.Parent = playerEntry
+                    playerId.Parent = playerInfo
                     playerId.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                     playerId.BackgroundTransparency = 1.000
-                    playerId.Size = UDim2.new(0, 330, 0, 15)
+                    playerId.Position = UDim2.new(0, 0, 0, 25)
+                    playerId.Size = UDim2.new(1, 0, 0, 15)
                     playerId.Font = Enum.Font.Gotham
-                    playerId.Text = "User ID: " .. player.UserId
+                    playerId.Text = "ID: " .. player.UserId
                     playerId.TextColor3 = Color3.fromRGB(200, 200, 200)
                     playerId.TextSize = 12
                     playerId.TextXAlignment = Enum.TextXAlignment.Left
+                    playerId.TextTruncate = Enum.TextTruncate.AtEnd
+                    
+                    -- Load player avatar asynchronously
+                    spawn(function()
+                        local success, result = pcall(function()
+                            return game:GetService("Players"):GetUserThumbnailAsync(
+                                player.UserId,
+                                Enum.ThumbnailType.HeadShot,
+                                Enum.ThumbnailSize.Size100x100
+                            )
+                        end)
+                        
+                        if success and result then
+                            playerAvatar.Image = result
+                        else
+                            playerAvatar.Image = "rbxassetid://0" -- Fallback to placeholder
+                        end
+                    end)
                     
                     -- Click event for player selection
                     playerEntry.MouseButton1Click:Connect(function()
@@ -1470,6 +1512,16 @@ function Kavo.CreateLib(kavName, themeList)
                     else
                         warn("Error getting players: " .. tostring(result))
                     end
+                    
+                    -- Update scroll frame size
+                    local totalHeight = 0
+                    for _, entry in pairs(playerListFrame:GetChildren()) do
+                        if entry:IsA("TextButton") then
+                            totalHeight = totalHeight + entry.AbsoluteSize.Y + 5 -- 5px padding
+                        end
+                    end
+                    
+                    playerListFrame.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
                     
                     updateSectionFrame()
                     UpdateSize()
