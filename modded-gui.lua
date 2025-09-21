@@ -1400,7 +1400,7 @@ function Kavo.CreateLib(kavName, themeList)
                     playerName.Position = UDim2.new(0, 0, 0, 5)
                     playerName.Size = UDim2.new(1, 0, 0, 20)
                     playerName.Font = Enum.Font.GothamSemibold
-                    playerName.Text = player.Name
+                    playerName.Text = player.DisplayName
                     playerName.TextColor3 = themeList.TextColor
                     playerName.TextSize = 14
                     playerName.TextXAlignment = Enum.TextXAlignment.Left
@@ -1478,7 +1478,7 @@ function Kavo.CreateLib(kavName, themeList)
                     end)
                     
                     playerEntries[player] = playerEntry
-                    currentPlayers[player.Name:lower()] = player
+                    currentPlayers[player.DisplayName:lower()] = player
                     
                     return playerEntry
                 end
@@ -1505,7 +1505,7 @@ function Kavo.CreateLib(kavName, themeList)
                     
                     if success then
                         for _, player in pairs(result) do
-                            if filter == "" or player.Name:lower():find(filter) then
+                            if filter == "" or player.DisplayName:lower():find(filter) then
                                 createPlayerEntry(player)
                             end
                         end
@@ -1532,7 +1532,7 @@ function Kavo.CreateLib(kavName, themeList)
                 
                 -- Player added event
                 players.PlayerAdded:Connect(function(player)
-                    if searchBox.Text == "" or player.Name:lower():find(searchBox.Text:lower()) then
+                    if searchBox.Text == "" or player.DisplayName:lower():find(searchBox.Text:lower()) then
                         createPlayerEntry(player)
                         updateSectionFrame()
                         UpdateSize()
@@ -1544,7 +1544,7 @@ function Kavo.CreateLib(kavName, themeList)
                     if playerEntries[player] then
                         playerEntries[player]:Destroy()
                         playerEntries[player] = nil
-                        currentPlayers[player.Name:lower()] = nil
+                        currentPlayers[player.DisplayName:lower()] = nil
                         
                         if selectedPlayer == player then
                             selectedPlayer = nil
