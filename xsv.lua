@@ -16,17 +16,13 @@ image.AnchorPoint = Vector2.new(0.5, 0.5)
 image.Position = UDim2.new(0.5, 0, 0.5, 0)
 image.BackgroundTransparency = 1
 image.Image = "rbxassetid://91438373912852"
-local logo = Instance.new("IconDecon")
-image.Parent = screenGui
-image.Image = "rbxassetid://91438373912852"
 -- Message
 StarterGui:SetCore("SendNotification", {
-    Title = "XSV 3.0X",
+    Title = "XSV 3.1X",
     Text = "Welcome!",
-    Icon = logo,
+    Icon = "rbxassetid://91438373912852",
     Duration = 5
 })
-logo:Destroy()
 --Logo Apply
 local function LogoShow()
     -- Уменьшение
@@ -59,7 +55,7 @@ end
 LogoShow()
 -- Gui
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GHOST-428/XSV-Roblox/refs/heads/main/modded-gui.lua"))()
-local Window = Library.CreateLib("XSV [1.7F][Nemor03]", "RJTheme3")
+local Window = Library.CreateLib("XSV [3.0X][Nemor03]", "RJTheme3")
 
 -- Boxes
 local track
@@ -79,7 +75,6 @@ local Settings = {
     GodMode = false,
     Speed = 19,
     Jump = 30,
-    CurrentPlayer,
     Bang = false,
     FaceSit = false,
     Flinging = false,
@@ -144,7 +139,6 @@ local Visual = TabVisual:NewSection("ESP")
 local TabPlayers = Window:NewTab("Players")
 -- Section
 local List = TabPlayers:NewSection("List")
-local Controll = TabPlayers:NewSection("Controll")
 
 --- Fun
 local TabTroll = Window:NewTab("Troll")
@@ -165,11 +159,11 @@ local Ring = TabGod:NewSection("Ring Parts")
 local Levitate = TabGod:NewSection("Levitate Parts")
 
 -- Player
-Player:NewSlider("Speed", "Walk Speed", 300, 1, function(s)
+Player:NewSlider("Speed", "Walk Speed", 100000, 1, function(s)
     Settings.Speed = s
 end)
 
-Player:NewSlider("Jump Power", "Jump Height", 300, 1, function(s)
+Player:NewSlider("Jump Power", "Jump Height", 600, 1, function(s)
     Settings.Jump = s
 end)
 
@@ -195,13 +189,8 @@ Visual:NewToggle("Player", "Show player ESP", function(state)
 end)
 
 -- List
-Controll:NewButton("Refresh List", "Update Player List", function()
-    -- Добавляем всех игроков
-    for _, player in pairs(Players:GetPlayers()) do
-        button = List:NewButton(player.DisplayName, "The Player", function()
-            Settings.CurrentPlayer = player
-        end)
-    end
+local TheList = List:NewPlayerList(function(selectedPlayer)
+    -- List
 end)
 
 -- Troll
@@ -236,21 +225,28 @@ end)
 
 Current:NewButton("Fling", "The Fling for Selected Player", function()
     -- Players.LocalPlayer
-    -- Settings.CurrentPlayer
+    -- TheList:GetSelectedPlayer()
 
     local Thrust = Instance.new('BodyThrust', Players.LocalPlayer.Character.HumanoidRootPart)
     Thrust.Force = Vector3.new(9999,9999,9999)
     Thrust.Name = "YeetForce"
 
     repeat
-        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame
-        Thrust.Location = Settings.CurrentPlayer.Character.HumanoidRootPart.Position
+        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = TheList:GetSelectedPlayer().Character.HumanoidRootPart.CFrame
+        Thrust.Location = TheList:GetSelectedPlayer().Character.HumanoidRootPart.Position
         RunService.Heartbeat:wait()
-    until not Settings.CurrentPlayer.Character:FindFirstChild("Head") or not Settings.CurrentPlayer.Character:FindFirstChild("HumanoidRootPart")
+    until not TheList:GetSelectedPlayer().Character:FindFirstChild("Head") or not TheList:GetSelectedPlayer().Character:FindFirstChild("HumanoidRootPart")
 
     if Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChild("YeetForce") then
         Players.LocalPlayer.Character.HumanoidRootPart.YeetForce:Destroy()
     end
+end)
+
+Current:NewButton("Teleport", "Teleport you for Selected Player", function()
+    -- Players.LocalPlayer
+    -- TheList:GetSelectedPlayer()
+
+    Players.LocalPlayer.Character.HumanoidRootPart.CFrame = TheList:GetSelectedPlayer().Character.HumanoidRootPart.CFrame
 end)
 
 Current:NewToggle("BlackHole", "Enable/Disable BlackHole Parts", function(state)
@@ -506,11 +502,11 @@ RunService.Heartbeat:Connect(function()
     end
 
     if Settings.Bang then
-        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 1)
+        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = TheList:GetSelectedPlayer().Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 1)
     end
 
     if Settings.FaceSit then
-        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Settings.CurrentPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, -0.6) * CFrame.Angles(0, math.pi, 0)
+        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = TheList:GetSelectedPlayer().Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, -0.6) * CFrame.Angles(0, math.pi, 0)
     end
 
     if Settings.RingParts then
@@ -562,7 +558,7 @@ RunService.Heartbeat:Connect(function()
     if Settings.BlackHoleParts then
         for _, part in pairs(workspace:GetDescendants()) do
             if part:IsA("BasePart") and not part.Anchored then
-                local direction = (Settings.CurrentPlayer.Character.HumanoidRootPart.Position - part.Position).Unit
+                local direction = (TheList:GetSelectedPlayer().Character.HumanoidRootPart.Position - part.Position).Unit
                 part.Velocity = direction * 100000000
             end
         end
