@@ -55,7 +55,7 @@ end
 LogoShow()
 -- Gui
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GHOST-428/XSV-Roblox/refs/heads/main/modded-gui.lua"))()
-local Window = Library.CreateLib("XSV [3.0X][Nemor03]", "RJTheme3")
+local Window = Library.CreateLib("XSV [3.1X][Nemor03]", "RJTheme3")
 
 -- Boxes
 local track
@@ -158,8 +158,14 @@ local TabGod = Window:NewTab("God's power")
 local Ring = TabGod:NewSection("Ring Parts")
 local Levitate = TabGod:NewSection("Levitate Parts")
 
+--- Exploits
+local Exploit = Window:NewTab("Exploit's")
+-- Section
+local Gears = Exploit:NewSection("Gears")
+local Mods = Exploit:NewSection("[FE] Mods")
+
 -- Player
-Player:NewSlider("Speed", "Walk Speed", 100000, 1, function(s)
+Player:NewSlider("Speed", "Walk Speed", 1000, 1, function(s)
     Settings.Speed = s
 end)
 
@@ -240,13 +246,6 @@ Current:NewButton("Fling", "The Fling for Selected Player", function()
     if Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChild("YeetForce") then
         Players.LocalPlayer.Character.HumanoidRootPart.YeetForce:Destroy()
     end
-end)
-
-Current:NewButton("Teleport", "Teleport you for Selected Player", function()
-    -- Players.LocalPlayer
-    -- TheList:GetSelectedPlayer()
-
-    Players.LocalPlayer.Character.HumanoidRootPart.CFrame = TheList:GetSelectedPlayer().Character.HumanoidRootPart.CFrame
 end)
 
 Current:NewToggle("BlackHole", "Enable/Disable BlackHole Parts", function(state)
@@ -410,6 +409,32 @@ Levitate:NewToggle("Enable", "Enable/Disable Levitate Parts", function(state)
     end
 end)
 
+Gears:NewButton("Give All", "Clone all Gears to BackPack", function()
+    for i, v in pairs(game:GetDescendants()) do
+        if v:IsA("Tool") and v.Parent.Parent ~= game:GetService("Players").LocalPlayer then
+            local clonedTool = v:Clone()
+            clonedTool.Parent = game:GetService("Players").LocalPlayer:WaitForChild("Backpack")
+        end
+    end
+
+    StarterGui:SetCore("SendNotification", {
+        Title = "XSV 3.1X",
+        Text = "All tools received!",
+        Icon = "rbxassetid://91438373912852",
+        Duration = 5
+    })
+end)
+
+Mods:NewButton("X Admin", "Mod", function()
+
+    StarterGui:SetCore("SendNotification", {
+        Title = "XSV 3.1X",
+        Text = "Hah, now you're an admin",
+        Icon = "rbxassetid://91438373912852",
+        Duration = 5
+    })
+end)
+
 game.Players.LocalPlayer.Character.Humanoid.HealthChanged:Connect(function()
     if Settings.GodMode then
         game.Players.LocalPlayer.Character.Humanoid.Health = 100
@@ -424,12 +449,12 @@ RunService.Heartbeat:Connect(function()
         for _, player in pairs(Players:GetPlayers()) do
             if player ~= Players.LocalPlayer then
                 local char = player.Character
-                local humanoidRoot = char:FindFirstChild("HumanoidRootPart")
+                local humanoidRoot = char.HumanoidRootPart
 
                 -- Создаем или обновляем ESP Box
-                if not char:FindFirstChild("ESPBox") then
+                if not char.UUPBOXXXXX then
                     local box = Instance.new("BoxHandleAdornment")
-                    box.Name = "ESPBox"
+                    box.Name = "UUPBOXXXXX"
                     box.Adornee = char
                     box.Size = char:GetExtentsSize() * 1.1
                     box.Transparency = 0.7
@@ -440,9 +465,9 @@ RunService.Heartbeat:Connect(function()
                 end
                     
                 -- Создаем или обновляем текст с ником
-                if not char:FindFirstChild("ESPLabel") then
+                if not char.UU100SKLOOP then
                     local billboard = Instance.new("BillboardGui")
-                    billboard.Name = "ESPLabel"
+                    billboard.Name = "UU100SKLOOP"
                     billboard.Adornee = humanoidRoot
                     billboard.Size = UDim2.new(0, 100, 0, 40)
                     billboard.StudsOffset = Vector3.new(0, 2.5, 0)
@@ -466,11 +491,11 @@ RunService.Heartbeat:Connect(function()
     else
         for _, player in ipairs(Players:GetPlayers()) do
             if player.Character then
-                if player.Character:FindFirstChild("ESPBox") then
-                    player.Character.ESPBox:Destroy()
+                if player.Character.UUPBOXXXXX then
+                    player.Character.UUPBOXXXXX:Destroy()
                 end
-                if player.Character:FindFirstChild("ESPLabel") then
-                    player.Character.ESPLabel:Destroy()
+                if player.Character.UU100SKLOOP then
+                    player.Character.UU100SKLOOP:Destroy()
                 end
             end
         end
